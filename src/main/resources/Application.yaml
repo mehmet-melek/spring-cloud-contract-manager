@@ -21,5 +21,5 @@ spring:
       product-version: 0.0.1-SNAPSHOT/contracts
 
 git:
-  user: mehmetmelekk@gmail.com
-  token: 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
+  user: mail@gmail.com
+  token: token

@@ -1,6 +1,8 @@
 package com.melek.springcloudcontractmanager.contract.controller;
 
+import com.melek.springcloudcontractmanager.contract.dto.BranchDto;
 import com.melek.springcloudcontractmanager.contract.dto.ContractDto;
+import com.melek.springcloudcontractmanager.contract.dto.ProductDto;
 import com.melek.springcloudcontractmanager.contract.response.ContractCreationResponse;
 import com.melek.springcloudcontractmanager.contract.response.ContractSearchResponse;
 import com.melek.springcloudcontractmanager.contract.service.ContractService;
@@ -24,6 +26,18 @@ public class ContractController {
     @ResponseStatus(HttpStatus.CREATED)
     public ContractCreationResponse createContract(@RequestBody ContractDto contractDto) {
         return contractService.createContract(contractDto);
+    }
+
+    @PutMapping("/update/{contractId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ContractCreationResponse updateContract(@PathVariable Long contractId, @RequestBody ContractDto contractDto) {
+        return contractService.createContract(contractDto);
+    }
+
+    @PutMapping("/update/consumer/{contractId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ContractCreationResponse updateConsumer(@PathVariable Long contractId, @RequestBody Set<ProductDto> consumer) {
+        return contractService.updateConsumer(contractId,consumer);
     }
 
     @GetMapping("/find")

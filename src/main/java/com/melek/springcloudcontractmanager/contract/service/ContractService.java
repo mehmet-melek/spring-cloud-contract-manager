@@ -97,4 +97,12 @@ public class ContractService {
         contractRepository.deleteById(contractId);
         return "Deleted";
     }
+
+    public ContractCreationResponse updateConsumer(Long contractId, Set<ProductDto> consumer) {
+        Contract contract = contractRepository.findById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
+        contract.setConsumer(productService.createAndGetConsumer(consumer));
+        ContractFile contractFile = contractMapper.contractToContractFile(contract);
+        saveContractAndGetResponse(contract,contractFile);
+        return null;
+    }
 }
