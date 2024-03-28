@@ -23,10 +23,10 @@ public class Product {
     @JsonManagedReference
     private Long id;
 
-    private String groupId;
+    private String groupName;
 
     @Column(unique = true)
-    private String artifactId;
+    private String artifactName;
 
     @OneToMany(mappedBy = "provider")
     @JsonIgnore

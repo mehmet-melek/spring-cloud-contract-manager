@@ -10,11 +10,11 @@ import com.melek.springcloudcontractmanager.contract.model.Branch;
 import com.melek.springcloudcontractmanager.contract.model.Contract;
 import com.melek.springcloudcontractmanager.contract.model.Product;
 import com.melek.springcloudcontractmanager.contract.repository.ContractRepository;
+import com.melek.springcloudcontractmanager.contract.response.ContractCreationResponse;
 import com.melek.springcloudcontractmanager.contract.response.ContractSearchResponse;
 import com.melek.springcloudcontractmanager.gitoperations.ContractFileOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -27,8 +27,6 @@ public class ContractService {
     private final ContractRepository contractRepository;
     private final RequestValidationService requestValidationService;
     private final ContractFileOperations contractFileOperations;
-    private static final String CREATED = "created";
-    private static final String UPDATED = "updated";
 
     public ContractService(ProductService productService, IdCreationService idCreationService, BranchService branchService, ContractMapper contractMapper, ContractRepository contractRepository, RequestValidationService requestValidationService, ContractFileOperations contractFileOperations) {
         this.productService = productService;
@@ -40,29 +38,16 @@ public class ContractService {
         this.contractFileOperations = contractFileOperations;
     }
 
-    /**
-     * Creates a new contract.
-     *
-     * @param contractDto The contract data transfer object
-     * @return A message indicating the contract creation status
-     */
-    public String createContract(ContractDto contractDto) {
-        Contract contractEntity = prepareContract(contractDto);
+
+    public ContractCreationResponse createContract(ContractDto contractDto) {
+        Contract contractEntity = perepareContract(contractDto);
         ContractFile contractFile = contractMapper.contractDtoToContractFile(contractDto);
         contractFile.getMetadata().setId(contractEntity.getId());
-        contractRepository.saveAndFlush(contractEntity);
-        contractFileOperations.addOrUpdateContractOnLocalRepoAndPushToGit(contractFile, CREATED);
-        return String.format("Contract Created: %s", contractDto.getName());
+        return saveContractAndGetResponse(contractEntity, contractFile);
     }
 
 
-    /**
-     * Prepares a contract entity for persistence.
-     *
-     * @param contractDto The contract data transfer object
-     * @return The prepared contract entity
-     */
-    private Contract prepareContract(ContractDto contractDto) {
+    private Contract perepareContract(ContractDto contractDto) {
 
         Set<ProductDto> consumerDto = requestValidationService.validateRequestAndGetConsumerDto(contractDto);
         ProductDto providerDto = requestValidationService.validateRequestAndGetProviderDto(contractDto);
@@ -79,123 +64,45 @@ public class ContractService {
         contract.setBranch(branches);
         contract.setId(idCreationService.generateUniqueId());
         return contract;
+
+    }
+
+    private ContractCreationResponse saveContractAndGetResponse(Contract contractEntity, ContractFile contractFile) {
+        contractRepository.save(contractEntity);
+        contractFileOperations.addContractToLocalRepoAndPushToGit(contractFile);
+        return contractMapper.contractToContractCreationResponse(contractEntity);
     }
 
 
-    /**
-     * Deletes a contract by ID.
-     *
-     * @param contractId The contract ID
-     * @return A message indicating the contract deletion status
-     * @throws ContractNotFoundException If the contract is not found
-     */
-    public String deleteContract(Long contractId) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-        ContractFile contractFile = contractMapper.contractToContractFile(contract);
-        contractFileOperations.deleteContractFromLocalRepoAndPushToGit(contractFile);
-        contractRepository.deleteById(contractId);
-        return String.format("Contract deleted: %s", contract.getName());
-    }
-
-    /**
-     * Updates the consumers of a contract.
-     *
-     * @param contractId The contract ID
-     * @param consumers  The new consumers
-     * @return A message indicating the consumer update status
-     * @throws ContractNotFoundException If the contract is not found
-     */
-    public String updateConsumer(Long contractId, Set<ProductDto> consumers) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-        contract.setConsumer(productService.createAndGetConsumer(consumers));
-        ContractFile contractFile = contractMapper.contractToContractFile(contract);
-        contractRepository.saveAndFlush(contract);
-        contractFileOperations.addOrUpdateContractOnLocalRepoAndPushToGit(contractFile, UPDATED);
-
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("Consumers updated.\nNew consumer list:\n");
-        consumers.forEach(consumer -> messageBuilder.append(String.format("%s:%s%n", consumer.getGroupId(), consumer.getArtifactId())));
-        return messageBuilder.toString();
-    }
-
-    /**
-     * Updates the branches of a contract.
-     *
-     * @param contractId   The contract ID
-     * @param newBranchDto The new branches
-     * @return A message indicating the branch update status
-     * @throws ContractNotFoundException If the contract is not found
-     */
-    public String updateBranch(Long contractId, Set<BranchDto> newBranchDto) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-        ContractFile contractFile = contractMapper.contractToContractFile(contract);
-        Set<BranchDto> existingBranches = contractFile.getMetadata().getBranch();
-        Set<BranchDto> branchesToBeDeleted = new HashSet<>();
-
-        for (BranchDto existingBranch : existingBranches) {
-            boolean existsInNewBranches = newBranchDto.contains(existingBranch);
-            if (!existsInNewBranches) {
-                branchesToBeDeleted.add(existingBranch);
-            }
-        }
-
-        Set<Branch> newBranches = branchService.createAndGetBranches(newBranchDto);
-        contract.setBranch(newBranches);
-        contractRepository.saveAndFlush(contract);
-        if (!branchesToBeDeleted.isEmpty()) {
-            contractFile.getMetadata().setBranch(branchesToBeDeleted);
-            contractFileOperations.deleteContractFromLocalRepoAndPushToGit(contractFile);
-        }
-        contractFile.getMetadata().setBranch(newBranchDto);
-        contractFileOperations.addOrUpdateContractOnLocalRepoAndPushToGit(contractFile, UPDATED);
-
-        //Todo: branch deletion notify to consumer
-
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("Environments updated\nNew environment list:\n");
-        newBranchDto.forEach(branch -> messageBuilder.append(String.format("%s%n", branch.getName())));
-        return messageBuilder.toString();
-    }
-
-    /**
-     * Updates an existing contract with the given data.
-     *
-     * @param contractId  The ID of the contract to update
-     * @param contractDto The contract data transfer object containing the updated data
-     * @return A message indicating the contract update status
-     * @throws ContractNotFoundException If the contract is not found
-     */
-    public String updateContract(Long contractId, ContractDto contractDto) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-        Contract newContract = contractMapper.contractDtoToContract(contractDto);
-        newContract.setId(contract.getId());
-        newContract.setConsumer(contract.getConsumer());
-        newContract.setProvider(contract.getProvider());
-        newContract.setBranch(contract.getBranch());
-        ContractFile contractFile = contractMapper.contractToContractFile(newContract);
-        contractFileOperations.addOrUpdateContractOnLocalRepoAndPushToGit(contractFile, UPDATED);
-        contractRepository.saveAndFlush(newContract);
-        return String.format("Contract updated: %s", contractDto.getName());
-    }
-
-    public Set<ContractSearchResponse> getContractsWithApplicationInfo(String project, String product, String application, String environment) {
-        Set<Contract> contracts;
-        if (environment != null) {
-            contracts = contractRepository.findByProjectAndProductAndApplicationAndBranch_Name(project, product, application, environment);
-        } else {
-            contracts = contractRepository.findByProjectAndProductAndApplication(project, product, application);
-        }
+    public Set<ContractSearchResponse> getContractsWithArtifactId(String artifactId) {
+        Set<Contract> contracts = contractRepository.findByProviderArtifactName(artifactId);
         if (contracts.isEmpty()) {
-            throw new ContractNotFoundException(project, product, application);
+            throw new ContractNotFoundException(artifactId);
         }
         return contractMapper.contractListToContractSearchResponse(contracts);
     }
 
-    public Long getMaxContractId() {
-        return contractRepository.findMaxId();
+    public Set<ContractSearchResponse> getContractsWithArtifactIdAndEnv(String artifactId, String env) {
+        Set<Contract> contracts = contractRepository.findByProviderArtifactNameAndBranchName(artifactId, env);
+        if (contracts.isEmpty()) {
+            throw new ContractNotFoundException(artifactId, env);
+        }
+        return contractMapper.contractListToContractSearchResponse(contracts);
+    }
+
+    public String deleteContract(Long contractId) {
+        Contract contract = contractRepository.findById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
+        ContractFile contractFile = contractMapper.contractToContractFile(contract);
+        contractFileOperations.deleteContractFromLocalRepoAndPushToGit(contractFile);
+        contractRepository.deleteById(contractId);
+        return "Deleted";
+    }
+
+    public ContractCreationResponse updateConsumer(Long contractId, Set<ProductDto> consumer) {
+        Contract contract = contractRepository.findById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
+        contract.setConsumer(productService.createAndGetConsumer(consumer));
+        ContractFile contractFile = contractMapper.contractToContractFile(contract);
+        saveContractAndGetResponse(contract,contractFile);
+        return null;
     }
 }

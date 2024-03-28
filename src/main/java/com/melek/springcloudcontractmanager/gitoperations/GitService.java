@@ -2,7 +2,6 @@ package com.melek.springcloudcontractmanager.gitoperations;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +87,7 @@ public class GitService {
 
 
     public void cloneLongLivedBranches() {
+        deleteContractRepositoryDirectoryIfExist();
         cloneBranch(devBranchName, devLocalPath);
         cloneBranch(testBranchName, testLocalPath);
         cloneBranch(uatBranchName, uatLocalPath);
@@ -98,10 +98,10 @@ public class GitService {
         try {
             Path pathToBeDeleted = Paths.get("contractRepository");
             deleteDirectoryRecursively(pathToBeDeleted);
+            logger.info("Existing directory deleted before clone process");
         } catch (IOException e) {
             logger.info("An error occurred while deleting the folder: {}", e.getMessage());
         }
-        logger.info("Existing local repository deleted before repository clone");
     }
 
 

@@ -8,7 +8,6 @@ import com.melek.springcloudcontractmanager.contract.model.Product;
 import com.melek.springcloudcontractmanager.contract.repository.ContractRepository;
 import com.melek.springcloudcontractmanager.contract.service.BranchService;
 import com.melek.springcloudcontractmanager.contract.service.ProductService;
-import com.melek.springcloudcontractmanager.util.ContractFileConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,5 +84,9 @@ public class InitialDataLoaderService {
         }
         return contractFiles;
     }
+
+
+
+
 
 }

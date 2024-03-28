@@ -17,17 +17,15 @@ public class ContractDto {
     private boolean ignored = false;
     private String name;
     private String description;
-    private String project;
-    private String product;
-    private String application;
     private Map<String, Object> request;
     private Map<String, Object> response;
     private String directory = "base";
-    private ContractStatus status = ContractStatus.ACTIVE;
+    private ContractStatus status;
     private Set<ProductDto> consumer = new HashSet<>();
     private ProductDto provider;
     private Set<BranchDto> branch = new HashSet<>();
-}
-//"", ", "label", "outputMessage", "input", "", "", "", "inProgress", "priority", ""])
 
+    //"", ", "label", "outputMessage", "input", "", "", "", "inProgress", "priority", ""])
+
+}
 

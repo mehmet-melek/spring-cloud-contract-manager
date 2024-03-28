@@ -8,6 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ProductDto {
-    private String groupId;
-    private String artifactId;
+    private String groupName;
+    private String artifactName;
 }

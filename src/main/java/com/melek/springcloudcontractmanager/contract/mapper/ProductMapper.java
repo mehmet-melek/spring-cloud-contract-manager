@@ -13,9 +13,7 @@ import java.util.Set;
 public interface ProductMapper {
 
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
-
     Product productDtoToProduct(ProductDto productDto);
-
     Set<Product> productDtoListToProductList(Set<ProductDto> productDtoSet);
 
 }

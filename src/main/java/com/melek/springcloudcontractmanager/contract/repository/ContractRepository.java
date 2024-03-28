@@ -10,18 +10,11 @@ import java.util.Set;
 
 @Repository
 public interface ContractRepository extends JpaRepository<Contract, Long> {
-    Set<Contract> findByProviderArtifactId(String providerArtifactId);
+    Set<Contract> findByProviderArtifactName(String providerArtifactName);
 
-    @Query("SELECT c FROM Contract c JOIN c.provider p JOIN c.branch b WHERE p.artifactId = :artifactId AND b.name = :branchName")
-    Set<Contract> findByProviderArtifactIdAndBranchName(@Param("artifactId") String artifactId, @Param("branchName") String branchName);
-
-    Set<Contract> findByProjectAndProductAndApplication(String project, String product, String application);
-
-    Set<Contract> findByProjectAndProductAndApplicationAndBranch_Name(String project, String product, String application, String branchName);
-
+    @Query("SELECT c FROM Contract c JOIN c.provider p JOIN c.branch b WHERE p.artifactName = :artifactName AND b.name = :branchName")
+    Set<Contract> findByProviderArtifactNameAndBranchName(@Param("artifactName") String artifactName, @Param("branchName") String branchName);
 
     @Query("SELECT MAX(e.id) FROM Contract e")
     Long findMaxId();
-
-
 }

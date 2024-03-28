@@ -23,9 +23,6 @@ public class ContractSearchResponse {
     private Long id;
     private Boolean ignored;
     private String name;
-    private String project;
-    private String product;
-    private String application;
     private String description;
     private String directory;
     private ContractStatus status;

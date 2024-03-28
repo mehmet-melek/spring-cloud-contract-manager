@@ -25,7 +25,7 @@ public class ProductService {
         Set<Product> consumers = productMapper.productDtoListToProductList(consumerDto);
         return consumers.stream()
                 .map(product -> {
-                    Optional<Product> existingProduct = productRepository.findByArtifactId(product.getArtifactId());
+                    Optional<Product> existingProduct = productRepository.findByArtifactName(product.getArtifactName());
                     return existingProduct.orElseGet(() -> productRepository.save(product));
                 })
                 .collect(Collectors.toSet());
@@ -34,24 +34,23 @@ public class ProductService {
 
     public Product createAndGetProvider(ProductDto providerDto) {
         Product provider = productMapper.productDtoToProduct(providerDto);
-        Optional<Product> existingProduct = productRepository.findByArtifactId(provider.getArtifactId());
+        Optional<Product> existingProduct = productRepository.findByArtifactName(provider.getArtifactName());
         return existingProduct.orElseGet(() -> productRepository.save(provider));
     }
 
     public Set<Product> saveInitialConsumers(Set<Product> consumers) {
         return consumers.stream()
                 .map(product -> {
-                    Optional<Product> existingProduct = productRepository.findByArtifactId(product.getArtifactId());
+                    Optional<Product> existingProduct = productRepository.findByArtifactName(product.getArtifactName());
                     return existingProduct.orElseGet(() -> productRepository.save(product));
                 })
                 .collect(Collectors.toSet());
     }
 
     public Product saveInitialProvider(Product provider) {
-        Optional<Product> existingProduct = productRepository.findByArtifactId(provider.getArtifactId());
+        Optional<Product> existingProduct = productRepository.findByArtifactName(provider.getArtifactName());
         return existingProduct.orElseGet(() -> productRepository.save(provider));
     }
-
 }
 
 
