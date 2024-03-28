@@ -2,13 +2,15 @@ package com.melek.springcloudcontractmanager.gitoperations;
 
 import com.melek.springcloudcontractmanager.contract.dto.ContractFile;
 import com.melek.springcloudcontractmanager.contract.exception.ContractNotFoundException;
-import com.melek.springcloudcontractmanager.contract.mapper.ContractMapper;
+import com.melek.springcloudcontractmanager.util.ContractFileConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -42,17 +44,17 @@ public class ContractFileOperations {
     @Value("${spring.cloud.contract.base-path}")
     private String basePath;
 
+    @Value("${spring.cloud.contract.temp-path}")
+    private String tempPath;
     private final String userDirectory = System.getProperty("user.dir");
 
-
-    public void addContractToLocalRepoAndPushToGit(ContractFile contractFile) {
-
+    public void addOrUpdateContractOnLocalRepoAndPushToGit(ContractFile contractFile, String processType) {
         contractFile.getMetadata().getBranch().forEach(branch -> {
             String environment = branch.getName();
             String contractDirectoryAndName = getContractDirectoryAndName(contractFile, environment);
-            logger.info("The contract named '{}' will be created in the '{}' environment.", contractFile.getName(), environment);
-            contractFileConverter.createContractYamlFileFromContractFileEntity(contractFile, contractDirectoryAndName);
-            gitService.commitAndPushChanges(userDirectory + File.separator + getBranchDirectory(environment), "Contract crated: " + contractFile.getName());
+            logger.info("The contract named '{}' will be {} in the '{}' environment.", contractFile.getName(), processType, environment);
+            contractFileConverter.createContractYamlFileFromContractFileObject(contractFile, contractDirectoryAndName);
+            gitService.commitAndPushChanges(userDirectory + File.separator + getBranchDirectory(environment), String.format("Contract %s: %s", processType, contractFile.getName()));
         });
 
     }
@@ -64,9 +66,9 @@ public class ContractFileOperations {
             logger.info("The contract named '{}' will be deleted from '{}' environment.", contractFile.getName(), environment);
             File file = new File(jsonPath);
             if (file.delete()) {
-                logger.info("Contract file deleted.");
+                logger.info("Contract file deleted.Name: {}", contractFile.getName());
             } else {
-                throw new ContractNotFoundException(1L);
+                throw new ContractNotFoundException(contractFile.getName());
             }
             gitService.commitAndPushChanges(userDirectory + File.separator + getBranchDirectory(environment), "Contract deleted: " + contractFile.getName());
         });
@@ -84,14 +86,14 @@ public class ContractFileOperations {
             case "DEV" -> devLocalPath;
             case "TEST" -> testLocalPath;
             case "UAT" -> uatLocalPath;
-            default -> "temp";
+            default -> tempPath;
         };
     }
 
     private Path createContractPath(ContractFile contractFile, String localPath) {
         return Paths.get(userDirectory, localPath, basePath,
-                contractFile.getMetadata().getProvider().getGroupName(),
-                contractFile.getMetadata().getProvider().getArtifactName(),
+                contractFile.getMetadata().getProvider().getGroupId(),
+                contractFile.getMetadata().getProvider().getArtifactId(),
                 productVersion,
                 contractFile.getMetadata().getDirectory(),
                 contractFile.getName() + ".yaml");

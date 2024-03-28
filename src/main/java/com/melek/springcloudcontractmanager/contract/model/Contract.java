@@ -21,9 +21,14 @@ public class Contract {
     private Boolean ignored;
     private String name;
     private String description;
+    private String project;
+    private String product;
+    private String application;
+
+    @Enumerated(EnumType.STRING)
     private ContractStatus status;
 
-    @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JsonIgnore
     @JoinTable(
             name = "contract_branch",
@@ -34,7 +39,6 @@ public class Contract {
     private String directory;
     private String request;
     private String response;
-
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "product_id")

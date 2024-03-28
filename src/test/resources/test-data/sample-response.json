@@ -1,0 +1,9 @@
+{
+  "response": {
+    "status": 404,
+    "body": "test reponse body!",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

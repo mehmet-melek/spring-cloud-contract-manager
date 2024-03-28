@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class IdCreationService {
 
-    private final ContractRepository contractRepository;
+    private final ContractService contractService;
 
-    public IdCreationService(ContractRepository contractRepository) {
-        this.contractRepository = contractRepository;
+    public IdCreationService(ContractService contractService) {
+        this.contractService = contractService;
     }
 
     public Long generateUniqueId() {
-        Long maxId = contractRepository.findMaxId();
+        Long maxId = contractService.getMaxContractId();
         return (maxId == null) ? 1 : maxId + 1;
     }
 

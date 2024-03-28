@@ -1,4 +1,4 @@
-package com.melek.springcloudcontractmanager.gitoperations;
+package com.melek.springcloudcontractmanager.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melek.springcloudcontractmanager.contract.dto.ContractFile;
@@ -26,8 +26,7 @@ public class ContractFileConverter {
         return contractFile;
     }
 
-    public void createContractYamlFileFromContractFileEntity(ContractFile contractFile, String contractDirectoryAndName) {
-
+    public void createContractYamlFileFromContractFileObject(ContractFile contractFile, String contractDirectoryAndName) {
         try {
             File file = new File(contractDirectoryAndName);
             file.getParentFile().mkdirs();
@@ -38,9 +37,6 @@ public class ContractFileConverter {
             logger.info("An error occurred while creating the contract! : {}", e.getMessage());
         }
     }
-
-
-
 
 
 }
