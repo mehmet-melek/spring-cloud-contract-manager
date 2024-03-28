@@ -13,6 +13,7 @@ import java.util.Set;
 public interface BranchMapper {
 
     BranchMapper INSTANCE = Mappers.getMapper(BranchMapper.class);
+
     Set<Branch> branchDtoListToBranchList(Set<BranchDto> branchDtoSet);
 
 }

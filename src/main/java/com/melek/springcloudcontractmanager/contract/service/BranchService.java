@@ -33,14 +33,7 @@ public class BranchService {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Branch> getBranchSet(String env) {
-        Set<Branch> branchSet = new HashSet<>();
-        Branch branch = branchRepository.findByName(env).orElseThrow();
-        branchSet.add(branch);
-        return branchSet;
-    }
-
-    public Set<Branch> saveInitialBranches (Set<Branch> branches) {
+    public Set<Branch> saveInitialBranches(Set<Branch> branches) {
         return branches.stream()
                 .map(branch -> {
                     Optional<Branch> existingBranch = branchRepository.findByName(branch.getName());

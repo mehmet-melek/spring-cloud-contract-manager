@@ -17,9 +17,10 @@ spring:
       local-dev-path: ${spring.cloud.contract.repository-path}/${spring.cloud.contract.dev-branch-name}
       local-test-path: ${spring.cloud.contract.repository-path}/${spring.cloud.contract.test-branch-name}
       local-uat-path: ${spring.cloud.contract.repository-path}/${spring.cloud.contract.uat-branch-name}
+      local-temp-path: ${spring.cloud.contract.repository-path}/temp
       base-path: META-INF
       product-version: 0.0.1-SNAPSHOT/contracts
 
 git:
-  user: mail@gmail.com
+  user: user
   token: token
