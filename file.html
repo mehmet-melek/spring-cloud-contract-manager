@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Testing Strategies in Microservices</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1440px !important;
+        }
+
+        .approach-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .approach-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+        }
+
+        .flow-diagram {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 2px solid #e2e8f0;
+        }
+
+        .flow-step.consumer {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+
+        .flow-step.provider {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .flow-step.automated {
+            border-color: #8b5cf6;
+            background: #f5f3ff;
+        }
+
+        .pros-cons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-box {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: 100%;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            background: white;
+        }
+
+        .comparison-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .rating::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .rating-high {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .rating-high::before {
+            background: #166534;
+        }
+
+        .rating-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .rating-medium::before {
+            background: #92400e;
+        }
+
+        .rating-low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .rating-low::before {
+            background: #991b1b;
+        }
+
+        .process-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0ea5e9;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: 100%;
+            border-top: 4px solid;
+        }
+
+        .info-card.consumer {
+            border-top-color: #0ea5e9;
+        }
+
+        .info-card.provider {
+            border-top-color: #10b981;
+        }
+
+        .info-card.automated {
+            border-top-color: #8b5cf6;
+        }
+
+        .challenge-box {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .solution-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-gradient-to-r from-sky-600 to-teal-600 text-white py-16">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-4">
+                Contract Testing Strategies
+            </h1>
+            <p class="text-xl text-center text-sky-100">
+                A Modern Approach to Microservices Integration Testing
+            </p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <!-- Overview Section -->
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-sky-900 mb-8 text-center">Why Contract Testing?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-red-50 p-6 rounded-xl h-full">
+                        <h3 class="font-semibold text-red-700 mb-4">Challenges</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">🔄</span>
+                                <span class="text-red-700">Complex service dependencies</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">⚠️</span>
+                                <span class="text-red-700">API compatibility issues</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">🐌</span>
+                                <span class="text-red-700">Slow end-to-end testing</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">💔</span>
+                                <span class="text-red-700">Fragile integration points</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-xl h-full">
+                        <h3 class="font-semibold text-green-700 mb-4">Benefits</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">✅</span>
+                                <span class="text-green-700">Early feedback on integration issues</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">🚀</span>
+                                <span class="text-green-700">Independent service deployment</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">📝</span>
+                                <span class="text-green-700">Clear API expectations</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="text-xl">🔒</span>
+                                <span class="text-green-700">Reliable service integration</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-12">
+                <img src="sunum2.png" alt="Contract Testing Overview" class="w-4/5 ">
+            </div>
+        </section>
+
+        <!-- Approaches Section -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-bold text-sky-900 mb-12 text-center">Contract Testing Approaches</h2>
+            
+            <!-- CDC -->
+            <div class="approach-card p-8 mb-12">
+                <h3 class="text-2xl font-bold text-sky-600 mb-6">
+                    Consumer-Driven Contract (CDC)
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="process-flow">
+                            <div class="process-step consumer">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <h4 class="font-semibold">Consumer Writes Contract</h4>
+                                    <p class="text-sm text-gray-600">Defines expected behavior and responses</p>
+                                </div>
+                            </div>
+                            <div class="process-step provider">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <h4 class="font-semibold">Provider Implements & Verifies</h4>
+                                    <p class="text-sm text-gray-600">Ensures API meets consumer expectations</p>
+                                </div>
+                            </div>
+                            <div class="process-step consumer">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <h4 class="font-semibold">Consumer Tests with Stubs</h4>
+                                    <p class="text-sm text-gray-600">Uses generated stubs for integration testing</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="challenge-box">
+                            <h4 class="font-semibold text-orange-700 mb-2">Management Challenges</h4>
+                            <ul class="space-y-2 text-sm text-orange-800">
+                                <li>• Complex N-N relationships between consumers and providers</li>
+                                <li>• GitOps complications with contract management</li>
+                                <li>• Provider becomes dependent on consumer updates</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="info-card consumer h-auto">
+                            <h4 class="font-semibold mb-3">Key Characteristics</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li>✓ Consumer needs drive API design</li>
+                                <li>✓ Clear documentation of actual usage</li>
+                                <li>✓ Early breaking change detection</li>
+                                <li>⚠️ Requires strong team coordination</li>
+                            </ul>
+                        </div>
+                        <div class="solution-box">
+                            <h4 class="font-semibold text-sky-700 mb-2">Best Practices</h4>
+                            <ul class="space-y-2 text-sm text-sky-800">
+                                <li>• Centralized contract repository</li>
+                                <li>• Automated contract verification in CI/CD</li>
+                                <li>• Clear contract ownership and update process</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDC -->
+            <div class="approach-card p-8 mb-12">
+                <h3 class="text-2xl font-bold text-emerald-600 mb-6">
+                    Provider-Driven Contract (PDC)
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="process-flow">
+                            <div class="process-step provider">
+                                <div class="step-number bg-emerald-500">1</div>
+                                <div>
+                                    <h4 class="font-semibold">Provider Defines Contracts</h4>
+                                    <p class="text-sm text-gray-600">Creates and maintains API contracts</p>
+                                </div>
+                            </div>
+                            <div class="process-step provider">
+                                <div class="step-number bg-emerald-500">2</div>
+                                <div>
+                                    <h4 class="font-semibold">Generate & Run Tests</h4>
+                                    <p class="text-sm text-gray-600">Automated test generation and verification</p>
+                                </div>
+                            </div>
+                            <div class="process-step consumer">
+                                <div class="step-number bg-emerald-500">3</div>
+                                <div>
+                                    <h4 class="font-semibold">Optional Consumer Integration</h4>
+                                    <p class="text-sm text-gray-600">Consumers can use generated stubs</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-card provider h-auto">
+                            <h4 class="font-semibold mb-3">Provider Control</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li>✓ Full control over API evolution</li>
+                                <li>✓ Easier contract management</li>
+                                <li>✓ Simplified test generation</li>
+                                <li>⚠️ May miss consumer requirements</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="challenge-box">
+                            <h4 class="font-semibold text-orange-700 mb-2">Integration Challenges</h4>
+                            <ul class="space-y-2 text-sm text-orange-800">
+                                <li>• Consumers not required to use stubs</li>
+                                <li>• Changes only detected through new builds</li>
+                                <li>• Potential gap in real usage validation</li>
+                            </ul>
+                        </div>
+                        <div class="solution-box">
+                            <h4 class="font-semibold text-sky-700 mb-2">Recommendations</h4>
+                            <ul class="space-y-2 text-sm text-sky-800">
+                                <li>• Regular contract reviews with consumers</li>
+                                <li>• Automated stub distribution</li>
+                                <li>• Clear change communication process</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OpenAPI-Driven -->
+            <div class="approach-card p-8 mb-12">
+                <h3 class="text-2xl font-bold text-purple-600 mb-6">
+                    OpenAPI-Driven Contracts
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <div class="process-flow">
+                            <div class="process-step automated">
+                                <div class="step-number bg-purple-500">1</div>
+                                <div>
+                                    <h4 class="font-semibold">OpenAPI Document Creation</h4>
+                                    <p class="text-sm text-gray-600">Write or generate OpenAPI spec</p>
+                                </div>
+                            </div>
+                            <div class="process-step automated">
+                                <div class="step-number bg-purple-500">2</div>
+                                <div>
+                                    <h4 class="font-semibold">Add x-contract Fields</h4>
+                                    <p class="text-sm text-gray-600">Enhance with test data</p>
+                                </div>
+                            </div>
+                            <div class="process-step automated">
+                                <div class="step-number bg-purple-500">3</div>
+                                <div>
+                                    <h4 class="font-semibold">Generate Assets</h4>
+                                    <p class="text-sm text-gray-600">Create stubs and tests</p>
+                                </div>
+                            </div>
+                            <div class="process-step automated">
+                                <div class="step-number bg-purple-500">4</div>
+                                <div>
+                                    <h4 class="font-semibold">Verify Implementation</h4>
+                                    <p class="text-sm text-gray-600">Run against application code</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="info-card automated h-auto">
+                            <h4 class="font-semibold mb-3">Advantages</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li>✓ API-First approach promotion</li>
+                                <li>✓ Automated stub generation</li>
+                                <li>✓ Consistent documentation</li>
+                                <li>✓ Reduced manual effort</li>
+                            </ul>
+                        </div>
+                        <div class="challenge-box">
+                            <h4 class="font-semibold text-orange-700 mb-2">Limitations</h4>
+                            <ul class="space-y-2 text-sm text-orange-800">
+                                <li>• Manual x-contract field addition</li>
+                                <li>• No runtime document usage</li>
+                                <li>• Limited IDE support</li>
+                                <li>• Cannot test business logic</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alternative Solution -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-bold text-sky-900 mb-12 text-center">Alternative Approach: open-api-diff</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="approach-card p-6">
+                    <h3 class="text-xl font-bold text-sky-600 mb-4">Key Features</h3>
+                    <div class="space-y-4">
+                        <div class="feature-box">
+                            <h4 class="font-semibold text-sky-700 mb-2">Breaking Change Detection</h4>
+                            <p class="text-sm text-gray-600">Automatically identifies API compatibility issues between versions</p>
+                        </div>
+                        <div class="feature-box">
+                            <h4 class="font-semibold text-sky-700 mb-2">CI/CD Integration</h4>
+                            <p class="text-sm text-gray-600">Seamlessly fits into existing pipelines</p>
+                        </div>
+                        <div class="feature-box">
+                            <h4 class="font-semibold text-sky-700 mb-2">Low Overhead</h4>
+                            <p class="text-sm text-gray-600">Minimal setup and maintenance required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="approach-card p-6">
+                    <h3 class="text-xl font-bold text-orange-600 mb-4">Considerations</h3>
+                    <div class="space-y-4">
+                        <div class="challenge-box">
+                            <h4 class="font-semibold text-orange-700 mb-2">Limitations</h4>
+                            <ul class="space-y-2 text-sm text-orange-800">
+                                <li>• Only structural validation</li>
+                                <li>• No business logic testing</li>
+                                <li>• Depends on OpenAPI quality</li>
+                            </ul>
+                        </div>
+                        <div class="solution-box">
+                            <h4 class="font-semibold text-sky-700 mb-2">Best Use Cases</h4>
+                            <ul class="space-y-2 text-sm text-sky-800">
+                                <li>• API evolution monitoring</li>
+                                <li>• Breaking change prevention</li>
+                                <li>• Quick feedback in CI/CD</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Matrix -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-bold text-sky-900 mb-12 text-center">Approach Comparison</h2>
+            <div class="overflow-x-auto">
+                <table class="comparison-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Criteria</th>
+                            <th>CDC</th>
+                            <th>PDC</th>
+                            <th>OpenAPI-Driven</th>
+                            <th>open-api-diff</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Setup/Writing Effort</td>
+                            <td><span class="rating rating-low">High</span></td>
+                            <td><span class="rating rating-medium">Medium</span></td>
+                            <td><span class="rating rating-high">Low</span></td>
+                            <td><span class="rating rating-high">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td>Meeting Consumer Expectations</td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-medium">Medium</span></td>
+                            <td><span class="rating rating-low">Low-Medium (Structural)</span></td>
+                            <td><span class="rating rating-low">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td>Provider API Flexibility</td>
+                            <td><span class="rating rating-low">Low</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-medium">Medium</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>Business Logic Test Coverage</td>
+                            <td><span class="rating rating-medium">Medium (If Consumer Defines)</span></td>
+                            <td><span class="rating rating-low">Low (If Provider Defines)</span></td>
+                            <td><span class="rating rating-low">Very Low / None</span></td>
+                            <td><span class="rating rating-low">None</span></td>
+                        </tr>
+                        <tr>
+                            <td>API Signature Validation</td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>Regression Protection</td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>Contract Generation Automation</td>
+                            <td><span class="rating rating-low">Low (Manual)</span></td>
+                            <td><span class="rating rating-low">Low (Manual)</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                            <td><span class="rating rating-high">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>"Wrong Feature Validation" Risk</td>
+                            <td><span class="rating rating-high">Low</span></td>
+                            <td><span class="rating rating-medium">Medium</span></td>
+                            <td><span class="rating rating-low">High (For Business Logic)</span></td>
+                            <td><span class="rating rating-low">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance Effort</td>
+                            <td><span class="rating rating-low">High</span></td>
+                            <td><span class="rating rating-medium">Medium</span></td>
+                            <td><span class="rating rating-high">Low</span></td>
+                            <td><span class="rating rating-high">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td>GitOps Complexity</td>
+                            <td><span class="rating rating-low">High (N-N Relations)</span></td>
+                            <td><span class="rating rating-medium">Medium</span></td>
+                            <td><span class="rating rating-high">Low</span></td>
+                            <td><span class="rating rating-high">Low</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 py-8 mt-12 text-center text-sm">
+        <p>© 2024 Contract Testing Strategies in Microservices</p>
+    </footer>
+</body>
+</html>
