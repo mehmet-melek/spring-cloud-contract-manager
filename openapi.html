@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Testing Strategies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: none;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            page-break-inside: avoid;
+        }
+
+        .title-page {
+            text-align: center;
+            padding: 3rem 2rem 2.5rem 2rem;
+            background: linear-gradient(135deg, #e0e7ef 0%, #f8fafc 100%);
+            color: #1e293b;
+            border-radius: 1.25rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+        }
+
+        .title-page h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #2563eb;
+        }
+
+        .title-page p {
+            font-size: 1.1rem;
+            color: #475569;
+            opacity: 1;
+        }
+
+        .approach-card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: none;
+            border-left: 4px solid #e0e7ef;
+        }
+
+        .approach-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .approach-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            margin: 2rem 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            background: white;
+        }
+
+        .comparison-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .rating-high {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .rating-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .rating-low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .process-flow {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 2rem;
+            height: 2rem;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .arrow {
+            margin: 0 1rem;
+            color: #64748b;
+            font-size: 1.5rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .title-page h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- Title Page -->
+    <div class="title-page" style="background: #f8fafc; color: #1e293b; box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04); border-radius: 1.5rem; margin-bottom: 2.5rem;">
+        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: #1e293b;">Approaches for Contract & API Compatibility Testing</h1>
+        <div style="margin-top: 1.5rem;">
+            <span style="background: #e0e7ef; color: #2563eb; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; display: inline-block; font-size: 0.95rem;">Consumer-Driven</span>
+            <span style="background: #e0e7ef; color: #16a34a; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; display: inline-block; font-size: 0.95rem;">Provider-Driven</span>
+            <span style="background: #ede9fe; color: #7c3aed; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; display: inline-block; font-size: 0.95rem;">OpenAPI-Driven</span>
+            <span style="background: #fef3c7; color: #ea580c; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; display: inline-block; font-size: 0.95rem;">OpenAPI Diff Analysis</span>
+        </div>
+    </div>
+
+    <!-- Problem Statement -->
+    <div class="section">
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: #334155; margin-bottom: 1.5rem;">Current Challenges in Microservices Integration</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Integration Issues Card -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-100">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-red-50 to-slate-50 p-6 border-b border-slate-100">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Integration Issues</h3>
+                            <p class="text-slate-600">Current problems in microservices architecture</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="p-6">
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Complex N-to-N service dependencies</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">API compatibility and breaking changes</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Slow end-to-end testing bottlenecks</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Fragile integration points</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Limited service relationship visibility</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Manual change notifications</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Desired Outcomes Card -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-100">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-green-50 to-slate-50 p-6 border-b border-slate-100">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Desired Outcomes</h3>
+                            <p class="text-slate-600">Goals for improved integration</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="p-6">
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Early integration issue detection</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Independent service deployment</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Clear API expectations</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Reliable service integration</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Automated dependency discovery</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">•</span>
+                            <span class="text-slate-700">Proactive change notifications</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contract Testing Approaches -->
+    <div class="section">
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: #334155; margin-bottom: 2rem;">Contract Testing Approaches</h2>
+        <div style="margin-bottom: 3rem;">
+            <img src="sunum2.png" alt="Contract Testing Overview" style="display: block; margin-left: 0; margin-bottom: 2.5rem; width: 100%; max-width: 1000px;">
+        </div>
+
+          <!-- CDC Approach -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-16 border border-slate-100">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-50 to-slate-50 p-6 border-b border-slate-100">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800">Consumer-Driven Contract (CDC)</h3>
+                        <p class="text-slate-600">Consumers define the contract that providers must fulfill</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                <div>
+                    <h4 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                        How It Works
+                    </h4>
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-medium group-hover:bg-blue-600 group-hover:text-white transition-colors">1</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Consumer Defines Contract</h5>
+                                <p class="text-sm text-slate-600 mt-1">Consumer specifies expected API behavior and responses based on their needs</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-medium group-hover:bg-blue-600 group-hover:text-white transition-colors">2</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Provider Implements</h5>
+                                <p class="text-sm text-slate-600 mt-1">Provider implements the API to satisfy the consumer's contract</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-medium group-hover:bg-blue-600 group-hover:text-white transition-colors">3</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Consumer Tests with Stubs</h5>
+                                <p class="text-sm text-slate-600 mt-1">Consumer uses generated stubs from the contract for integration testing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Best Practices -->
+                    <div class="mt-8 bg-slate-50 p-4 rounded-lg w-full">
+                        <h5 class="font-medium text-slate-800 mb-2">Best Practices</h5>
+                        <ul class="text-sm text-slate-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Maintain a centralized contract repository</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Automate contract verification in CI/CD</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Define clear contract ownership</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Advantages -->
+                    <div class="mt-4 bg-green-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-green-700 mb-2">Advantages</h5>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Consumer needs drive API design</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Clear documentation of actual usage</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Early breaking change detection</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Challenges -->
+                    <div class="mt-4 bg-red-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-red-700 mb-2">Challenges</h5>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Complex N-N relationships</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>GitOps complications</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Requires strong coordination</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- PDC Approach -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-16 border border-slate-100">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-emerald-50 to-slate-50 p-6 border-b border-slate-100">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h3m9 0h-3m4 0h3m-3 0V9m0 0h3m-3 0h-3m3 0V5"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800">Provider-Driven Contract (PDC)</h3>
+                        <p class="text-slate-600">Provider writes the contract and generates stubs for consumers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                <div>
+                    <h4 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                        How It Works
+                    </h4>
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-medium group-hover:bg-emerald-600 group-hover:text-white transition-colors">1</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Provider Writes Contract</h5>
+                                <p class="text-sm text-slate-600 mt-1">Provider directly authors the contract (OpenAPI or similar) for their API.</p>
+                            </div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-medium group-hover:bg-emerald-600 group-hover:text-white transition-colors">2</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Unit Test Generation from Contract</h5>
+                                <p class="text-sm text-slate-600 mt-1">Instead of writing controller unit tests, provider uses the contract to auto-generate unit tests and stubs.</p>
+                            </div>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-medium group-hover:bg-emerald-600 group-hover:text-white transition-colors">3</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Consumer Uses Provider's Stub Jar</h5>
+                                <p class="text-sm text-slate-600 mt-1">Consumer adds the provider's generated stub jar as a dependency and uses it in their tests instead of custom mocks.</p>
+                            </div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-medium group-hover:bg-emerald-600 group-hover:text-white transition-colors">4</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Contract Change & Build Feedback</h5>
+                                <p class="text-sm text-slate-600 mt-1">If the contract changes and the consumer's build uses an outdated or incompatible stub jar, the consumer receives errors during build/test.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Best Practices -->
+                    <div class="mt-8 bg-slate-50 p-4 rounded-lg w-full">
+                        <h5 class="font-medium text-slate-800 mb-2">Best Practices</h5>
+                        <ul class="text-sm text-slate-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Automate stub jar generation and publishing in CI/CD</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Document contract changes and notify consumers</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Encourage consumers to always use the latest stub jar</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- When to Use -->
+                    <div class="mt-4 bg-emerald-50 p-4 rounded-lg w-full">
+                        <h5 class="font-medium text-emerald-800 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            When to Use
+                        </h5>
+                        <ul class="text-sm text-emerald-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2 mt-1">•</span>
+                                <span>Provider wants full control over contract definition</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2 mt-1">•</span>
+                                <span>Teams prefer contract-driven unit test generation</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2 mt-1">•</span>
+                                <span>Consumers can adapt to provider's contract and use stubs</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Advantages -->
+                    <div class="mt-4 bg-green-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-green-700 mb-2">Advantages</h5>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Provider's process is similar to writing unit tests</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Stub jar can be reused by multiple consumers</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Automated feedback for contract changes</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Challenges -->
+                    <div class="mt-4 bg-red-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-red-700 mb-2">Challenges</h5>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Coverage is low; business logic is not validated for consumers</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Consumers are limited to what provider exposes</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Relation/discovery is not guaranteed; stub jar usage is not enforced</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- OpenAPI-Driven Contracts -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-16 border border-slate-100">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-purple-50 to-slate-50 p-6 border-b border-slate-100">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800">OpenAPI-Driven Contracts</h3>
+                        <p class="text-slate-600">Leverage OpenAPI specifications for contract-first API development</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                <div>
+                    <h4 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                        How It Works
+                    </h4>
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-medium group-hover:bg-purple-600 group-hover:text-white transition-colors">1</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Create OpenAPI Document</h5>
+                                <p class="text-sm text-slate-600 mt-1">Design your API contract using OpenAPI specification</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-medium group-hover:bg-purple-600 group-hover:text-white transition-colors">2</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Enhance with x-contract</h5>
+                                <p class="text-sm text-slate-600 mt-1">Add test data and validation rules using x-contract extensions</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-medium group-hover:bg-purple-600 group-hover:text-white transition-colors">3</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Generate Test Assets</h5>
+                                <p class="text-sm text-slate-600 mt-1">Automatically create mocks, stubs, and test cases</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-medium group-hover:bg-purple-600 group-hover:text-white transition-colors">4</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Verify Implementation</h5>
+                                <p class="text-sm text-slate-600 mt-1">Run tests against your API implementation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Best Practices -->
+                    <div class="mt-8 bg-slate-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-slate-800 mb-2">Best Practices</h5>
+                        <ul class="text-sm text-slate-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Maintain comprehensive OpenAPI documentation</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Automate contract generation in CI/CD</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Use semantic versioning for specs</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- When to Use -->
+                    <div class="mt-4 bg-purple-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-purple-800 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            When to Use
+                        </h5>
+                        <ul class="text-sm text-purple-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2 mt-1">•</span>
+                                <span>API-first development approach</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2 mt-1">•</span>
+                                <span>When you have comprehensive OpenAPI specs</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2 mt-1">•</span>
+                                <span>For automated contract generation</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Advantages -->
+                    <div class="mt-4 bg-green-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-green-700 mb-2">Advantages</h5>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>API-First approach promotion</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Automated stub generation</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Consistent documentation</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Challenges -->
+                    <div class="mt-4 bg-red-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-red-700 mb-2">Challenges</h5>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Manual x-contract field addition</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>No business logic testing</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Risk of over-engineering</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: #334155; margin-bottom: 2rem;">OpenAPI Diff Analysis Approach</h2>
+
+
+        <!-- OpenAPI Diff Analysis -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-16 border border-slate-100">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-orange-50 to-slate-50 p-6 border-b border-slate-100">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800">OpenAPI Diff Analysis</h3>
+                        <p class="text-slate-600">Proactive change detection using OpenAPI specification comparison</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                <div>
+                    <h4 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                        How It Works
+                    </h4>
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-medium group-hover:bg-orange-600 group-hover:text-white transition-colors">1</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Centralized OpenAPI Management</h5>
+                                <p class="text-sm text-slate-600 mt-1">Store and version OpenAPI specifications in a centralized repository</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-medium group-hover:bg-orange-600 group-hover:text-white transition-colors">2</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Consumer Registration</h5>
+                                <p class="text-sm text-slate-600 mt-1">Register consumers and their API dependencies</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-medium group-hover:bg-orange-600 group-hover:text-white transition-colors">3</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Automatic Diff Analysis</h5>
+                                <p class="text-sm text-slate-600 mt-1">Automatically compare API versions and detect breaking changes</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="flex group">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-medium group-hover:bg-orange-600 group-hover:text-white transition-colors">4</div>
+                                <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                            </div>
+                            <div class="pt-1">
+                                <h5 class="font-medium text-slate-800">Proactive Notifications</h5>
+                                <p class="text-sm text-slate-600 mt-1">Notify affected consumers about potential breaking changes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Best Practices -->
+                    <div class="mt-8 bg-slate-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-slate-800 mb-2">Best Practices</h5>
+                        <ul class="text-sm text-slate-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Maintain high-quality OpenAPI specs</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Set up automated diff analysis</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-slate-500 mr-2">•</span>
+                                <span>Establish clear notification workflows</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- When to Use -->
+                    <div class="mt-4 bg-orange-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-orange-800 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            When to Use
+                        </h5>
+                        <ul class="text-sm text-orange-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-orange-500 mr-2 mt-1">•</span>
+                                <span>Large-scale microservices architecture</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-orange-500 mr-2 mt-1">•</span>
+                                <span>When you need proactive change detection</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-orange-500 mr-2 mt-1">•</span>
+                                <span>For regression prevention</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Advantages -->
+                    <div class="mt-4 bg-green-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-green-700 mb-2">Advantages</h5>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Zero development effort</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>High automation</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Proactive detection</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Challenges -->
+                    <div class="mt-4 bg-red-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-red-700 mb-2">Challenges</h5>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>No business logic testing</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                <span>Depends on spec quality</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="section">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 2rem;">Approach Comparison Matrix</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Criteria</th>
+                    <th>Consumer Driven C.</th>
+                    <th>Provider Driven C.</th>
+                    <th>OpenAPI Driven C.</th>
+                    <th>OpenAPI Diff Analyze</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Setup/Writing Effort</td>
+                    <td><span class="rating rating-low">● High</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-high">● Low</span></td>
+                </tr>
+                <tr>
+                    <td>Meeting Consumer Expectations</td>
+                    <td><span class="rating rating-high">● High</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-low">● Low</span></td>
+                    <td><span class="rating rating-low">● Low</span></td>
+                </tr>
+                <tr>
+                    <td>Provider Flexibility</td>
+                    <td><span class="rating rating-low">● Low</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                </tr>
+                <tr>
+                    <td>Business Logic Test Coverage</td>
+                    <td><span class="rating rating-high" style="background:#d1fae5;color:#065f46;">High (If Consumer Define)</span></td>
+                    <td><span class="rating rating-medium" style="background:#fef9c3;color:#92400e;">Medium (If Provider Define)</span></td>
+                    <td><span class="rating rating-low">● None</span></td>
+                    <td><span class="rating rating-low">● None</span></td>
+                </tr>
+                <tr>
+                    <td>API Signature Coverage</td>
+                    <td><span class="rating rating-low">● Low</span></td>
+                    <td><span class="rating rating-low">● Low</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                </tr>
+                <tr>
+                    <td>API Signature Validation</td>
+                    <td><span class="rating rating-high">● High</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                </tr>
+                <tr>
+                    <td>Regression Protection</td>
+                    <td><span class="rating rating-medium" style="background:#fef9c3;color:#92400e;">Medium (Insufficient Coverage)</span></td>
+                    <td><span class="rating rating-medium" style="background:#fef9c3;color:#92400e;">Medium (Insufficient Coverage)</span></td>
+                    <td><span class="rating rating-medium" style="background:#fef9c3;color:#92400e;">Medium (Business Logic is Missing)</span></td>
+                    <td><span class="rating rating-medium" style="background:#fef9c3;color:#92400e;">Medium (Business Logic is Missing)</span></td>
+                </tr>
+                <tr>
+                    <td>Generation With Automation</td>
+                    <td><span class="rating rating-low">● Low (Manual)</span></td>
+                    <td><span class="rating rating-low">● Low (Manual)</span></td>
+                    <td><span class="rating rating-medium">● Medium (Hybrid)</span></td>
+                    <td><span class="rating rating-high">● High</span></td>
+                </tr>
+                <tr>
+                    <td>"Wrong Feature Validation" Risk</td>
+                    <td><span class="rating rating-high">● Low</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-low">● High</span></td>
+                    <td><span class="rating rating-low">● High</span></td>
+                </tr>
+                <tr>
+                    <td>Maintenance Effort</td>
+                    <td><span class="rating rating-low">● High</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-low">● High</span></td>
+                    <td><span class="rating rating-high">● Low</span></td>
+                </tr>
+                <tr>
+                    <td>GitOps Complexity</td>
+                    <td><span class="rating rating-low" style="background:#fee2e2;color:#991b1b;">High (N-N Relations)</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-medium">● Medium</span></td>
+                    <td><span class="rating rating-high">● Low</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- Key Success Factors -->
+    <div class="section">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 2rem;">Key Success Factors</h2>
+        
+        <div class="grid-2">
+            <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem;">
+                <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 1rem;">Technical Requirements</h3>
+                <ul style="color: #475569; list-style: none; padding: 0;">
+                    <li style="margin-bottom: 0.5rem;">• Robust OpenAPI specification validation</li>
+                    <li style="margin-bottom: 0.5rem;">• Reliable diff analysis engine</li>
+                    <li style="margin-bottom: 0.5rem;">• Scalable notification system</li>
+                    <li style="margin-bottom: 0.5rem;">• Integration with existing CI/CD pipelines</li>
+                </ul>
+            </div>
+            
+            <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem;">
+                <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 1rem;">Organizational Factors</h3>
+                <ul style="color: #475569; list-style: none; padding: 0;">
+                    <li style="margin-bottom: 0.5rem;">• Team adoption and training</li>
+                    <li style="margin-bottom: 0.5rem;">• Clear ownership and responsibilities</li>
+                    <li style="margin-bottom: 0.5rem;">• OpenAPI specification quality standards</li>
+                    <li style="margin-bottom: 0.5rem;">• Regular review and improvement cycles</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html> 
